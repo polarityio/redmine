@@ -1,0 +1,88 @@
+{{#each issues as | issue index | }}
+    {{#if (gt index 0)}}
+        <hr>
+    {{/if}}
+    <div class="p-title">
+        <a href="{{block.userOptions.url}}/issues/{{issue.id}}">
+            {{issue.tracker.name}} #{{issue.id}}: {{issue.subject}} {{fa-icon "external-link-square" class="external-icon" fixedWidth=true}}
+        </a>
+    </div>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a {{action "changeTab" "info" index}} class="nav-link {{if (or (eq issue.__activeTab "info")(not issue.__activeTab)) "active"}}" href="#">{{issue.tracker.name}}</a>
+        </li>
+        <li class="nav-item">
+            <a {{action "changeTab" "history" index}} class="nav-link {{if (eq issue.__activeTab "history") "active"}}" href="#">Notes ({{issue.journals.length}})</a>
+        </li>
+    </ul>
+    {{#if (or (eq issue.__activeTab "info")(not issue.__activeTab))}}
+        <div class="mt-2">
+            <span class="p-key">Project:</span>
+            <span class="p-value">{{issue.project.name}}</span>
+        </div>
+        <div>
+            <span class="p-key">Status:</span>
+            <span class="p-value">{{issue.status.name}}</span>
+        </div>
+        <div>
+            <span class="p-key">Priority:</span>
+            <span class="p-value">{{issue.priority.name}}</span>
+        </div>
+        <div>
+            <span class="p-key">Assignee:</span>
+            <span class="p-value">{{issue.assigned_to.name}}</span>
+        </div>
+        <div>
+            <span class="p-key">Start Date:</span>
+            <span class="p-value">{{issue.start_date}}</span>
+        </div>
+        {{#each issue.custom_fields as | field | }}
+            <div>
+                <span class="p-key">{{field.name}}:</span>
+                <span class="p-value">{{field.value}}</span>
+            </div>
+        {{/each}}
+        <div class="description-container">
+            <span class="p-title">Description
+                <span class="p-action ml-1" {{action "editDescription" index}}>{{#if issue.__editDescription}}cancel{{else}}edit{{/if}}</span>
+                {{#if issue.__editDescription}}
+                    &nbsp;&nbsp;|<span class="p-action ml-1" {{action "saveDescription" index issue.id issue.description}}>save</span>
+                {{/if}}
+            </span>
+
+            {{#if issue.__editDescription}}
+                {{textarea class="description-textarea" value=issue.description}}
+            {{else}}
+                <div class="description">{{issue.description}}</div>
+            {{/if}}
+
+        </div>
+        {{#if (gt issue.attachments.length 0)}}
+            <div class="p-title">Files</div>
+        {{/if}}
+        {{#each issue.attachments as | attachment |}}
+            <div class="attachment-line">
+                {{fa-icon "paperclip" fixedWidth=true class="attachment-icon"}}<a href="{{block.userOptions.url}}/attachments/{{attachment.id}}">{{attachment.filename}}</a>
+                <a href="{{block.userOptions.url}}/attachments/download/{{attachment.id}}/{{attachment.filename}}">{{fa-icon "download" class="download-icon" fixedWidth=true}}</a>
+                <div class="ml-3">
+                    <span class="author-name">{{attachment.author.name}}</span>
+                    <span class="created-on">{{moment-format attachment.created_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
+                </div>
+            </div>
+        {{/each}}
+    {{/if}}
+    {{#if (eq issue.__activeTab "history")}}
+        <div>
+        {{#each issue.journals as | journal |}}
+            {{#if journal.notes}}
+                <div class="journal-entry">
+                    <div class="header">
+                        <span class="comment-username">{{journal.user.name}}</span> added a note on {{moment-format journal.created_on "YYYY-MM-DD HH:mm:ss z" timeZone=timeZone}}
+                    </div>
+                    <div class="note">{{journal.notes}}</div>
+                </div>
+            {{/if}}
+        {{/each}}
+        </div>
+    {{/if}}
+{{/each}}
