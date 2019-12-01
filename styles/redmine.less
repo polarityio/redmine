@@ -1,0 +1,116 @@
+.description {
+  //background: #eee;
+  //padding: 5px;
+  //margin-top: 5px;
+  white-space: pre-wrap;
+}
+
+.description-textarea{
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  line-height: 1;
+  color: #000000;
+  background-color: #f7f7f7;
+  background-clip: padding-box;
+  border: 1px solid #dedede;
+  border-radius: 0;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.external-icon {
+  font-size: 9px;
+}
+
+.attachment-line {
+  margin-bottom: 7px;
+
+  .attachment-icon {
+    color: #666;
+    font-size: 11px;
+    margin-right: 6px;
+  }
+
+  .download-icon {
+    font-size: 10px;
+    margin-left: 2px;
+  }
+
+  .author-name {
+    color: #666;
+    display: inline-block;
+    margin-top: 2px;
+  }
+
+  .created-on {
+    color: #666;
+    display: inline-block;
+    margin-top: 2px;
+  }
+}
+
+.journal-entry:first-child{
+  margin-top: 5px;
+}
+
+.journal-entry:nth-child(even){
+  background: #eee;
+}
+.journal-entry:last-child{
+  border-bottom: none !important;
+}
+
+.journal-entry {
+  border-bottom: 1px solid #ddd;
+  padding: 5px 3px 5px 3px;
+
+  .header {
+    color: #9a9a9a;
+    margin-bottom: 5px;
+  }
+
+  .note{
+    margin-top: 5px;
+    white-space: pre-wrap;
+  }
+}
+
+.post-note-button-container {
+  text-align: right;
+}
+
+button {
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+button:hover {
+  background-color: darken(#fff, 10%);
+}
+
+.post-note-container {
+  margin-top: 5px;
+  border-bottom: none;
+  padding-bottom: 10px;
+  textarea {
+    width: 100%;
+  }
+}
+
+.busy-bar{
+  float:right;
+  position: absolute;
+  right: 0px;
+  margin-right: 10px;
+  margin-top: 8px;
+
+  .busy-icon{
+
+  }
+
+  .busy-text{
+    color: #888;
+    display: inline-block;
+    margin-left: 5px;
+  }
+}
