@@ -242,9 +242,32 @@ function onMessage(payload, options, cb) {
   }
 }
 
+function validateOptions(userOptions, cb) {
+  let errors = [];
+  if (
+    typeof userOptions.url.value !== 'string' ||
+    (typeof userOptions.url.value === 'string' && userOptions.url.value.length === 0)
+  ) {
+    errors.push({
+      key: 'url',
+      message: 'You must provide your Redmine Server URL'
+    });
+  }
+
+  if (typeof userOptions.url.value === 'string' && userOptions.url.value.endsWith('/')) {
+    errors.push({
+      key: 'url',
+      message: 'The Redmine Server URL cannot end with a trailing `/`'
+    });
+  }
+
+  cb(null, errors);
+}
+
 module.exports = {
   doLookup: doLookup,
   startup: startup,
   onDetails: onDetails,
-  onMessage: onMessage
+  onMessage: onMessage,
+  validateOptions: validateOptions
 };
