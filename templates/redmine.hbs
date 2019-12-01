@@ -7,13 +7,23 @@
             {{issue.tracker.name}} #{{issue.id}}: {{issue.subject}} {{fa-icon "external-link-square" class="external-icon" fixedWidth=true}}
         </a>
     </div>
+    {{#if issue.__error}}
+        <div class="alert alert-danger" role="alert">
+            {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__error}}
+        </div>
+    {{/if}}
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <a {{action "changeTab" "info" index}} class="nav-link {{if (or (eq issue.__activeTab "info")(not issue.__activeTab)) "active"}}" href="#">{{issue.tracker.name}}</a>
         </li>
         <li class="nav-item">
-            <a {{action "changeTab" "history" index}} class="nav-link {{if (eq issue.__activeTab "history") "active"}}" href="#">Notes ({{issue.journals.length}})</a>
+            <a {{action "changeTab" "history" index}} class="nav-link {{if (eq issue.__activeTab "history") "active"}}" href="#">Notes ({{issue.numNotes}})</a>
         </li>
+        {{#if issue.__busy}}
+            <div class="busy-bar">
+                {{fa-icon "spinner-third" spin=true class="p-green busy-icon"}}<span class="busy-text">Updating</span>
+            </div>
+        {{/if}}
     </ul>
     {{#if (or (eq issue.__activeTab "info")(not issue.__activeTab))}}
         <div class="mt-2">
@@ -44,14 +54,18 @@
         {{/each}}
         <div class="description-container">
             <span class="p-title">Description
-                <span class="p-action ml-1" {{action "editDescription" index}}>{{#if issue.__editDescription}}cancel{{else}}edit{{/if}}</span>
+                <button class="ml-2" {{action "editDescription" index}} type="submit" disabled={{issue.__busy}}>
+                    {{#if issue.__editDescription}}cancel{{else}}edit{{/if}}
+                </button>
                 {{#if issue.__editDescription}}
-                    &nbsp;&nbsp;|<span class="p-action ml-1" {{action "saveDescription" index issue.id issue.description}}>save</span>
+                    <button class="ml-1" {{action "saveDescription" index issue.id issue.description}} type="submit" disabled={{issue.__busy}}>
+                        save
+                    </button>
                 {{/if}}
             </span>
 
             {{#if issue.__editDescription}}
-                {{textarea class="description-textarea" value=issue.description}}
+                {{textarea class="description-textarea" value=issue.description rows=8}}
             {{else}}
                 <div class="description">{{issue.description}}</div>
             {{/if}}
@@ -72,6 +86,23 @@
         {{/each}}
     {{/if}}
     {{#if (eq issue.__activeTab "history")}}
+        <div class="post-note-container">
+            <div>
+                {{textarea value=issue.__note rows="3"}}
+            </div>
+            <div class="post-note-button-container d-flex align-items-center justify-content-between">
+                <div class="p-red">
+                    {{#if issue.__postNoteError}}
+                        {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__postNoteError}}
+                    {{/if}}
+                </div>
+                <div>
+                    <button {{action "addNote" index issue.id issue.__note}} type="submit" disabled={{issue.__busy}}>
+                        Post
+                    </button>
+                </div>
+            </div>
+        </div>
         <div>
         {{#each issue.journals as | journal |}}
             {{#if journal.notes}}

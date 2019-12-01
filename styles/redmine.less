@@ -75,23 +75,42 @@
   }
 }
 
-.post-comment-button-container {
+.post-note-button-container {
   text-align: right;
-
-  button {
-    border-radius: 4px;
-    background-color: #fff;
-  }
-
-  button:hover {
-    background-color: darken(#fff, 10%);
-  }
 }
 
-.post-comment-container {
+button {
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+button:hover {
+  background-color: darken(#fff, 10%);
+}
+
+.post-note-container {
+  margin-top: 5px;
   border-bottom: none;
   padding-bottom: 10px;
   textarea {
     width: 100%;
+  }
+}
+
+.busy-bar{
+  float:right;
+  position: absolute;
+  right: 0px;
+  margin-right: 10px;
+  margin-top: 8px;
+
+  .busy-icon{
+
+  }
+
+  .busy-text{
+    color: #888;
+    display: inline-block;
+    margin-left: 5px;
   }
 }

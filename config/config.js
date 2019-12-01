@@ -3,7 +3,7 @@ module.exports = {
   acronym: 'RED',
   pdescription: 'Searches issues for supported indicators in the Redmine Project management software',
   entityTypes: ['ipv4', 'hash', 'domain', 'email'],
-  logging: { level: 'trace' },
+  logging: { level: 'info' },
   block: {
     component: {
       file: './components/redmine.js'
@@ -34,7 +34,7 @@ module.exports = {
      * to the server without valid SSL certificates.  Please note that we do NOT recommending setting this
      * to false in a production environment.
      */
-    rejectUnauthorized: false
+    rejectUnauthorized: true
   },
   options: [
     {

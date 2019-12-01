@@ -103,7 +103,7 @@ function _getIssuesRequestOptions(issueId, options) {
     method: 'GET',
     uri: `${options.url}/issues/${issueId}.json`,
     qs: {
-      include: 'relations,children,journals,attachments,changesets'
+      include: 'relations,children,journals,attachments'
     }
   };
 
@@ -155,6 +155,24 @@ function doLookup(entities, options, cb) {
 }
 
 /**
+ * Returns the requested issue object
+ * @param issueId
+ * @param options
+ * @param cb
+ * @private
+ */
+function _getIssue(issueId, options, cb) {
+  const requestOptions = _getIssuesRequestOptions(issueId, options);
+  requestWithDefaults(requestOptions, 200, (err, body) => {
+    if (err) cb(err);
+    if (body.issue && Array.isArray(body.issue.journals)) {
+      body.issue.numNotes = body.issue.journals.filter((item) => item.notes.length > 0).length;
+    }
+    cb(null, body.issue);
+  });
+}
+
+/**
  * In the onDetails block we lookup each of the issue numbers we found in our search to get
  * more details.
  * @param lookupObject
@@ -167,12 +185,10 @@ function onDetails(lookupObject, options, cb) {
   async.each(
     issueIds,
     (issueId, next) => {
-      const requestOptions = _getIssuesRequestOptions(issueId, options);
-      requestWithDefaults(requestOptions, 200, (err, body) => {
-        if (err) cb(err);
-        Logger.debug({ body }, 'onDetails request results');
-        lookupObject.data.details.issues.push(body.issue);
-        next(null);
+      _getIssue(issueId, options, (err, issue) => {
+        if (err) next(err);
+        lookupObject.data.details.issues.push(issue);
+        next();
       });
     },
     (err) => {
@@ -182,28 +198,43 @@ function onDetails(lookupObject, options, cb) {
 }
 
 function _updateIssue(options, issueId, attributeName, attributeValue, cb) {
-  const requestOptions = {
+  const requestUpdateOptions = {
     method: 'PUT',
     uri: `${options.url}/issues/${issueId}.json`,
     body: {
       issue: {}
     }
   };
-  requestOptions.body.issue[attributeName] = attributeValue;
+  requestUpdateOptions.body.issue[attributeName] = attributeValue;
 
   if (options.apiKey.length > 0) {
-    requestOptions.headers = {};
-    requestOptions.headers['X-Redmine-API-Key'] = options.apiKey;
+    requestUpdateOptions.headers = {};
+    requestUpdateOptions.headers['X-Redmine-API-Key'] = options.apiKey;
   }
 
-  Logger.debug({requestOptions}, 'Update Issue');
-  requestWithDefaults(requestOptions, 200, cb);
+  Logger.debug({ requestUpdateOptions }, 'Update Issue');
+  requestWithDefaults(requestUpdateOptions, 200, (err) => {
+    if (err) cb(err);
+    _getIssue(issueId, options, (err, issue) => {
+      cb(err, issue);
+    });
+  });
 }
 
 function onMessage(payload, options, cb) {
-  switch(payload.action){
+  switch (payload.action) {
     case 'UPDATE_ATTRIBUTE':
-      _updateIssue(options, payload.id, payload.attributeName, payload.attributeValue, cb);
+      _updateIssue(options, payload.id, payload.attributeName, payload.attributeValue, (err, issue) => {
+        if (err) {
+          Logger.error(
+            err,
+            `Error updating attribute ${payload.attributeName} with value ${payload.attributeValue} (issue #${
+              payload.id
+            }`
+          );
+        }
+        cb(err, issue);
+      });
       break;
     default:
       cb('Invalid Action passed to onMessage');
