@@ -55,6 +55,7 @@ polarity.export = PolarityComponent.extend({
       this.sendIntegrationMessage(payload)
         .then((issue) => {
           this.set('issues.' + index + '.journals', issue.journals);
+          this.set('issues.' + index + '.numNotes', issue.numNotes);
         })
         .catch((err) => {
           this.setError(index, err);
