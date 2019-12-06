@@ -186,7 +186,7 @@ function onDetails(lookupObject, options, cb) {
     issueIds,
     (issueId, next) => {
       _getIssue(issueId, options, (err, issue) => {
-        if (err) next(err);
+        if (err) return next(err);
         lookupObject.data.details.issues.push(issue);
         next();
       });
