@@ -8,6 +8,10 @@ const config = require('./config/config');
 let Logger;
 let requestWithDefaults;
 
+// Statuses and users are populated on the first request
+let statuses = null;
+let users = null;
+
 function startup(logger) {
   Logger = logger;
   let requestOptions = {};
@@ -53,15 +57,23 @@ function handleRequestError(request) {
           resp: resp,
           detail: 'Error making HTTP request'
         });
-      } else if (resp.statusCode !== expectedStatusCode) {
+      } else if (resp.statusCode === expectedStatusCode) {
+        callback(null, body);
+      } else if (resp.statusCode === 401) {
+        callback({
+          detail: `You do not have permission to perform that action`,
+          messageType: 'alert-warning',
+          body: body,
+          expectedStatusCode: expectedStatusCode,
+          statusCode: resp.statusCode
+        });
+      } else {
         callback({
           detail: `Unexpected status code (${resp.statusCode}) when attempting HTTP request`,
           body: body,
           expectedStatusCode: expectedStatusCode,
           statusCode: resp.statusCode
         });
-      } else {
-        callback(null, body);
       }
     });
   };
@@ -115,8 +127,30 @@ function _getIssuesRequestOptions(issueId, options) {
   return requestOptions;
 }
 
-function doLookup(entities, options, cb) {
+async function doLookup(entities, options, cb) {
   let lookupResults = [];
+
+  if (options.adminApiKey.length > 0) {
+    if (statuses === null) {
+      try {
+        statuses = await _getStatuses(options);
+        Logger.debug({ statuses }, 'Fetched Statuses');
+      } catch (e) {
+        Logger.error({ e }, 'Failed to fetch statuses');
+        return cb(e);
+      }
+    }
+
+    if (users === null) {
+      try {
+        users = await _getUsers(options);
+        Logger.debug({ users }, 'Fetched Users');
+      } catch (e) {
+        Logger.error({ e }, 'Failed to fetch users');
+        return cb(e);
+      }
+    }
+  }
 
   async.each(
     entities,
@@ -168,6 +202,7 @@ function _getIssue(issueId, options, cb) {
     if (body.issue && Array.isArray(body.issue.journals)) {
       body.issue.numNotes = body.issue.journals.filter((item) => item.notes.length > 0).length;
     }
+    Logger.debug({ issue: body.issue }, 'Returning Issue');
     cb(null, body.issue);
   });
 }
@@ -179,9 +214,10 @@ function _getIssue(issueId, options, cb) {
  * @param options
  * @param cb
  */
-function onDetails(lookupObject, options, cb) {
+async function onDetails(lookupObject, options, cb) {
   const issueIds = lookupObject.data.details.issueIds;
   lookupObject.data.details.issues = [];
+
   async.each(
     issueIds,
     (issueId, next) => {
@@ -192,9 +228,95 @@ function onDetails(lookupObject, options, cb) {
       });
     },
     (err) => {
+      lookupObject.data.details.statuses = statuses;
+      lookupObject.data.details.users = users;
       cb(err, lookupObject.data);
     }
   );
+}
+
+function _updateAssignee(options, issueId, newAssignee, oldAssignee, cb) {
+  const requestUpdateOptions = {
+    method: 'PUT',
+    uri: `${options.url}/issues/${issueId}.json`,
+    body: {
+      issue: {
+        assigned_to_id: newAssignee.id
+      }
+    }
+  };
+
+  if (options.apiKey.length > 0) {
+    requestUpdateOptions.headers = {};
+    requestUpdateOptions.headers['X-Redmine-API-Key'] = options.apiKey;
+  }
+
+  Logger.debug({ requestUpdateOptions }, 'Update Status');
+  requestWithDefaults(requestUpdateOptions, 200, (err) => {
+    if (err) {
+      return cb(err);
+    }
+    _getIssue(issueId, options, (err, issue) => {
+      if (err) {
+        return cb(err);
+      }
+      // Redmine fails silently when a user attempts to update an attribute but does not have permissions
+      // or the attribute cannot be updated (e.g., transitioning from one status to another that is not allowed).
+      // As a result, we need to fetch the issue after updating and confirm that the attribute in question
+      // has changed values.  If the value as not changed then we return an error.
+      if (issue.assigned_to.id !== newAssignee.id) {
+        // update failed
+        cb({
+          detail: `Cannot update assignee from "${oldAssignee.name}" to "${newAssignee.name}"`,
+          messageType: 'alert-warning'
+        });
+      } else {
+        cb(null, issue);
+      }
+    });
+  });
+}
+
+function _updateStatus(options, issueId, newStatus, oldStatus, cb) {
+  const requestUpdateOptions = {
+    method: 'PUT',
+    uri: `${options.url}/issues/${issueId}.json`,
+    body: {
+      issue: {
+        status_id: newStatus.id
+      }
+    }
+  };
+
+  if (options.apiKey.length > 0) {
+    requestUpdateOptions.headers = {};
+    requestUpdateOptions.headers['X-Redmine-API-Key'] = options.apiKey;
+  }
+
+  Logger.debug({ requestUpdateOptions }, 'Update Status');
+  requestWithDefaults(requestUpdateOptions, 200, (err) => {
+    if (err) {
+      return cb(err);
+    }
+    _getIssue(issueId, options, (err, issue) => {
+      if (err) {
+        return cb(err);
+      }
+      // Redmine fails silently when a user attempts to update an attribute but does not have permissions
+      // or the attribute cannot be updated (e.g., transitioning from one status to another that is not allowed).
+      // As a result, we need to fetch the issue after updating and confirm that the attribute in question
+      // has changed values.  If the value as not changed then we return an error.
+      if (issue.status.id !== newStatus.id) {
+        // update failed
+        cb({
+          detail: `Cannot update status from "${oldStatus.name}" to "${newStatus.name}"`,
+          messageType: 'alert-warning'
+        });
+      } else {
+        cb(null, issue);
+      }
+    });
+  });
 }
 
 function _updateIssue(options, issueId, attributeName, attributeValue, cb) {
@@ -214,11 +336,101 @@ function _updateIssue(options, issueId, attributeName, attributeValue, cb) {
 
   Logger.debug({ requestUpdateOptions }, 'Update Issue');
   requestWithDefaults(requestUpdateOptions, 200, (err) => {
-    if (err) cb(err);
+    if (err) {
+      return cb(err);
+    }
+
     _getIssue(issueId, options, (err, issue) => {
-      cb(err, issue);
+      if (err) {
+        cb(err);
+      } else {
+        cb(null, issue);
+      }
     });
   });
+}
+
+/**
+ * Returns an array of status objects supported by the Redmine instance.
+ *
+ * Status objects have the format:
+ *
+ * {
+ *    "id": 1,
+ *    "name": "New",
+ *    "is_closed": false
+ * }
+ *
+ * @param options
+ * @param cb
+ * @private
+ */
+async function _getStatuses(options) {
+  let requestOptions = {
+    method: 'GET',
+    uri: `${options.url}/issue_statuses.json`
+  };
+
+  if (options.adminApiKey.length > 0) {
+    requestOptions.headers = {};
+    requestOptions.headers['X-Redmine-API-Key'] = options.adminApiKey;
+  }
+
+  const request = new Promise((resolve, reject) => {
+    requestWithDefaults(requestOptions, 200, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+
+      if (Array.isArray(result.issue_statuses)) {
+        resolve(result.issue_statuses);
+      } else {
+        // unexpected data
+        reject({
+          detail: 'Unexpected return payload when fetching issue statuses',
+          result
+        });
+      }
+    });
+  });
+
+  return request;
+}
+
+async function _getUsers(options) {
+  let requestOptions = {
+    method: 'GET',
+    uri: `${options.url}/users.json`
+  };
+
+  if (options.adminApiKey.length > 0) {
+    requestOptions.headers = {};
+    requestOptions.headers['X-Redmine-API-Key'] = options.adminApiKey;
+  }
+
+  const request = new Promise((resolve, reject) => {
+    requestWithDefaults(requestOptions, 200, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+
+      if (Array.isArray(result.users)) {
+        resolve(
+          result.users.map((user) => {
+            return { id: user.id, name: `${user.firstname} ${user.lastname}` };
+          })
+        );
+      } else {
+        // unexpected data
+        reject({
+          detail: 'Unexpected return payload when fetching users',
+          result
+        });
+      }
+    });
+  });
+
+  return request;
 }
 
 function onMessage(payload, options, cb) {
@@ -229,6 +441,30 @@ function onMessage(payload, options, cb) {
           Logger.error(
             err,
             `Error updating attribute ${payload.attributeName} with value ${payload.attributeValue} (issue #${
+              payload.id
+            }`
+          );
+        }
+        cb(err, issue);
+      });
+      break;
+    case 'UPDATE_STATUS':
+      _updateStatus(options, payload.id, payload.newStatus, payload.oldStatus, (err, issue) => {
+        if (err) {
+          Logger.error(
+            err,
+            `Error updating status from ${payload.newStatus.name} to ${payload.oldStatus.name} (issue #${payload.id}`
+          );
+        }
+        cb(err, issue);
+      });
+      break;
+    case 'UPDATE_ASSIGNEE':
+      _updateAssignee(options, payload.id, payload.newAssignee, payload.oldAssignee, (err, issue) => {
+        if (err) {
+          Logger.error(
+            err,
+            `Error updating status from ${payload.newAssignee.name} to ${payload.oldAssignee.name} (issue #${
               payload.id
             }`
           );

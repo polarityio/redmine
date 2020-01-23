@@ -2,16 +2,22 @@
     {{#if (gt index 0)}}
         <hr>
     {{/if}}
+
     <div class="p-title">
         <a href="{{block.userOptions.url}}/issues/{{issue.id}}">
             {{issue.tracker.name}} #{{issue.id}}: {{issue.subject}} {{fa-icon "external-link-square" class="external-icon" fixedWidth=true}}
         </a>
     </div>
+
     {{#if issue.__error}}
-        <div class="alert alert-danger" role="alert">
-            {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__error}}
+        <div class="alert {{issue.__error.type}} alert-dismissible" role="alert">
+          {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__error.message}}
+          <button {{action "closeError" index}} type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
     {{/if}}
+
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <a {{action "changeTab" "info" index}} class="nav-link {{if (or (eq issue.__activeTab "info")(not issue.__activeTab)) "active"}}" href="#">{{issue.tracker.name}}</a>
@@ -25,22 +31,69 @@
             </div>
         {{/if}}
     </ul>
+    {{#if (eq issue.__showUpdateModal true)}}
+      <div style="position:relative; width:100%">
+        <div class="update-modal">
+          <form>
+            <div class="form-group">
+              <label>{{capitalize updateFieldName}}</label>
+              {{#if (eq updateFieldName "assignee")}}
+                {{#power-select
+                        options=users
+                        selected=tmpUpdateValue
+                        searchEnabled=true
+                        searchField="name"
+                        placeholder="Users"
+                        onchange=(action (mut tmpUpdateValue)) as |user|}}
+                  {{user.name}}
+                {{/power-select}}
+              {{else}}
+                {{#power-select
+                        options=statuses
+                        selected=tmpUpdateValue
+                        searchEnabled=true
+                        searchField="name"
+                        placeholder="Statuses"
+                        onchange=(action (mut tmpUpdateValue)) as |status|}}
+                  {{status.name}}
+                {{/power-select}}
+              {{/if}}
+            </div>
+            <button type="submit" disabled={{isUpdating}} {{action "updateAttribute" issue updateFieldName tmpUpdateValue index}} class="float-right btn btn-sm btn-secondary">
+            {{#if isUpdating}}
+              {{fa-icon "spinner-third" spin=true fixedWidth=true}}
+            {{else}}
+              {{fa-icon "save" fixedWidth=true}}
+            {{/if}}
+            Save
+            </button>
+            <button type="submit" disabled={{isUpdating}} {{action "showUpdateModal" false updateFieldName tmpUpdateValue index}} class="float-right mr-1 btn btn-sm btn-outline-secondary">Cancel</button>
+          </form>
+        </div>
+      </div>
+    {{/if}}
     {{#if (or (eq issue.__activeTab "info")(not issue.__activeTab))}}
         <div class="mt-2">
             <span class="p-key">Project:</span>
             <span class="p-value">{{issue.project.name}}</span>
         </div>
         <div>
-            <span class="p-key">Status:</span>
-            <span class="p-value">{{issue.status.name}}</span>
+          <span class="p-key" {{action "showUpdateModal" true "status" issue.status index}}>Status {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
+          <span class="p-value"
+                style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.status.name}}</span>
         </div>
         <div>
             <span class="p-key">Priority:</span>
             <span class="p-value">{{issue.priority.name}}</span>
         </div>
         <div>
-            <span class="p-key">Assignee:</span>
-            <span class="p-value">{{issue.assigned_to.name}}</span>
+          <span class="p-key">Author:</span>
+          <span class="p-value">{{issue.author.name}}</span>
+        </div>
+        <div>
+          <span class="p-key" {{action "showUpdateModal" true "assignee" issue.assigned_to index}}>Assignee {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
+          <span class="p-value"
+                style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.assigned_to.name}}</span>
         </div>
         <div>
             <span class="p-key">Start Date:</span>
@@ -117,3 +170,4 @@
         </div>
     {{/if}}
 {{/each}}
+

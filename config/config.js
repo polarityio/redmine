@@ -48,6 +48,18 @@ module.exports = {
       adminOnly: true
     },
     {
+      key: 'adminApiKey',
+      name: 'Redmine Administrator REST APIKey',
+      description:
+        'A REST API Key for your Redmine administrator.  This key is used to retrieve user and status information when the integration first starts. The user information is used' +
+        'to populate the Assignee field of the issue.  If not provided, the status and assignee fields will not be editable.  The Admin API Key is not used for performing searches,' +
+        ' editing issues, adding notes.',
+      default: '',
+      type: 'password',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
       key: 'apiKey',
       name: 'Redmine REST APIKey',
       description:
