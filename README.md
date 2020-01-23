@@ -2,8 +2,6 @@
 
 The Polarity - Redmine integration searches the Redmine open source project management application for issues containing indicators of interest.
 
-![overlay](images/overlay.png)
-
 | ![image](images/overlay.png) | ![image](images/notes.png) | ![image](images/status.png)
 |---| --- | --- |
 |*Redmine Issue Information* | *Notes* | *Updating Issue Status* |
