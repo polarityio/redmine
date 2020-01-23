@@ -78,9 +78,13 @@
             <span class="p-value">{{issue.project.name}}</span>
         </div>
         <div>
-          <span class="p-key" {{action "showUpdateModal" true "status" issue.status index}}>Status {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
-          <span class="p-value"
-                style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.status.name}}</span>
+          {{!-- Don't allow editing of statuses if no statuses are loaded.  This happens if no admin API key is provided --}}
+          {{#if (gt statuses.length 0)}}
+            <span class="p-key" {{action "showUpdateModal" true "status" issue.status index}}>Status {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
+          {{else}}
+            <span class="p-key">Status: </span>
+          {{/if}}
+          <span class="p-value" style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.status.name}}</span>
         </div>
         <div>
             <span class="p-key">Priority:</span>
@@ -91,9 +95,13 @@
           <span class="p-value">{{issue.author.name}}</span>
         </div>
         <div>
-          <span class="p-key" {{action "showUpdateModal" true "assignee" issue.assigned_to index}}>Assignee {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
-          <span class="p-value"
-                style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.assigned_to.name}}</span>
+          {{!-- Don't allow editing of statuses if no statuses are loaded.  This happens if no admin API key is provided --}}
+          {{#if (gt users.length 0)}}
+            <span class="p-key" {{action "showUpdateModal" true "assignee" issue.assigned_to index}}>Assignee {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
+          {{else}}
+            <span class="p-key">Assignee: </span>
+          {{/if}}
+          <span class="p-value" style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.assigned_to.name}}</span>
         </div>
         <div>
             <span class="p-key">Start Date:</span>
