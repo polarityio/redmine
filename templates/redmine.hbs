@@ -114,6 +114,14 @@
             <span class="p-key">Start Date:</span>
             <span class="p-value">{{issue.start_date}}</span>
         </div>
+        <div>
+          <span class="p-key">Created:</span>
+          <span class="p-value">{{moment-format issue.created_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
+        </div>
+        <div>
+          <span class="p-key">Updated:</span>
+          <span class="p-value">{{moment-format issue.updated_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
+        </div>
         {{#each issue.custom_fields as | field | }}
             <div>
                 <span class="p-key">{{field.name}}:</span>
@@ -146,7 +154,7 @@
             <div class="attachment-line">
                 <div>
                   <span class="p-key">File: </span>
-                  <span class="p-value"><a href="{{block.userOptions.url}}/attachments/{{attachment.id}}">{{attachment.filename}}</a>
+                  <span class="p-value"><a href="{{block.userOptions.url}}/attachments/{{attachment.id}}">{{attachment.filename}} {{fa-icon "external-link-square" class="external-icon" fixedWidth=true}}</a>
                     <span class="ml-1 download-link"><a href="{{block.userOptions.url}}/attachments/download/{{attachment.id}}/{{attachment.filename}}">[download {{fa-icon "download" class="download-icon" fixedWidth=true}}]</a></span>
                     </span>
                 </div>
