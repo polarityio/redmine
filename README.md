@@ -26,6 +26,8 @@ A REST API Key for your Redmine administrator. This key is used to retrieve user
 
 > This option should be set to "Only admins can view and edit"
 
+> This option requires restarting the integration after being modified
+
 ### Redmine REST APIKey
 
 The REST API Key used to authenticate to your Redmine instance. If left blank, no authentication will be used when communicating with the specified Redmine instance.
@@ -46,7 +48,7 @@ If you get this error message while trying to update the status message it could
 
  The second possibility is that your account (as specified by the Redmine REST APIkey) does not have permission to update the status.
 
-### Cannot update description. Please check your permissions
+### Cannot update description. Please check your account permissions
 
 If you this message it means the Remine User REST API Key you provided does not have permissions to edit the description of the issue.
 
