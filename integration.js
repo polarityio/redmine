@@ -209,7 +209,7 @@ async function doLookup(entities, options, cb) {
  * @param cb
  * @private
  */
-function _getIssue(issueId, options, cb) {
+function _getIssue(options, issueId, cb) {
   const requestOptions = _getIssuesRequestOptions(issueId, options);
   requestWithDefaults(requestOptions, 200, (err, body) => {
     if (err) cb(err);
@@ -235,7 +235,7 @@ async function onDetails(lookupObject, options, cb) {
   async.each(
     issueIds,
     (issueId, next) => {
-      _getIssue(issueId, options, (err, issue) => {
+      _getIssue(options, issueId, (err, issue) => {
         if (err) return next(err);
         lookupObject.data.details.issues.push(issue);
         next();
@@ -270,7 +270,7 @@ function _updateAssignee(options, issueId, newAssignee, oldAssignee, cb) {
     if (err) {
       return cb(err);
     }
-    _getIssue(issueId, options, (err, issue) => {
+    _getIssue(options, issueId, (err, issue) => {
       if (err) {
         return cb(err);
       }
@@ -312,7 +312,7 @@ function _updateStatus(options, issueId, newStatus, oldStatus, cb) {
     if (err) {
       return cb(err);
     }
-    _getIssue(issueId, options, (err, issue) => {
+    _getIssue(options, issueId, (err, issue) => {
       if (err) {
         return cb(err);
       }
@@ -354,14 +354,14 @@ function _updateIssue(options, issueId, attributeName, attributeValue, cb) {
       return cb(err);
     }
 
-    _getIssue(issueId, options, (err, issue) => {
-      if(err){
+    _getIssue(options, issueId, (err, issue) => {
+      if (err) {
         return cb(err);
       }
 
-      if(issue[attributeName] !== attributeValue){
+      if (attributeName === 'description' && issue[attributeName] !== attributeValue) {
         return cb({
-          detail: `Cannot update description.  Please check your permissions."`,
+          detail: `Cannot update description.  Please check your account permissions.`,
           messageType: 'alert-warning'
         });
       }
@@ -489,6 +489,14 @@ function onMessage(payload, options, cb) {
               payload.id
             }`
           );
+        }
+        cb(err, issue);
+      });
+      break;
+    case 'REFRESH_ISSUE':
+      _getIssue(options, payload.id, (err, issue) => {
+        if (err) {
+          Logger.error(err, `Error retrieving issue #${payload.id}`);
         }
         cb(err, issue);
       });

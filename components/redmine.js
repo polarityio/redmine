@@ -52,6 +52,7 @@ polarity.export = PolarityComponent.extend({
         })
         .catch((err) => {
           this.setError(index, err);
+          this._refreshIssue(id, index, 'description');
         })
         .finally(() => {
           this.toggleProperty('issues.' + index + '.__editDescription');
@@ -174,6 +175,26 @@ polarity.export = PolarityComponent.extend({
         self.set(`issues.${issueIndex}.__showUpdateModal`, false);
         self.set('isUpdating', false);
         self.get('block').notifyPropertyChange('data');
+      });
+  },
+  _refreshIssue: function(issueId, issueIndex, field) {
+    this.setBusyStatus(issueIndex, true);
+
+    let payload = {
+      action: 'REFRESH_ISSUE',
+      id: issueId
+    };
+
+    this.sendIntegrationMessage(payload)
+      .then((issue) => {
+        this.set('issues.' + issueIndex + '.' + field, issue[field]);
+      })
+      .catch((err) => {
+        this.setError(issueIndex, err);
+      })
+      .finally(() => {
+        this.setBusyStatus(issueIndex, false);
+        this.get('block').notifyPropertyChange('data');
       });
   }
 });
