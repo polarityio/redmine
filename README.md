@@ -40,7 +40,7 @@ The name of a single project to search. If left blank, all projects will be sear
 
 ## Common Error and Warning Messages
 
-### Cannot update status from “<old status>” to “<new status>”
+### Cannot update status from “\<old status>” to “\<new status>”
 
 If you get this error message while trying to update the status message it could be one of two issues.  The first issue is that Redmine only allows transitions from between certain Statuses.  So for example, your Redmine instance might not allow a status to transition from “Rejected” to “New”.
 
@@ -50,7 +50,7 @@ If you get this error message while trying to update the status message it could
 
 If you this message it means the Remine User REST API Key you provided does not have permissions to edit the description of the issue.
 
-### Cannot update assignee from <username> to <username>
+### Cannot update assignee from \<username> to \<username>
 
 If you get this error message it means the Redmine User REST API Key you provided in your options does not have permission to change the assignee on the issue in question.
 
@@ -67,7 +67,7 @@ GET https://<redmine-server>/users.json
 GET https://<redmine-server>/issue_statuses.json
 ```
 
-### Unexpected status code <status-code> when attempting HTTP request
+### Unexpected status code \<status-code> when attempting HTTP request
 
 If you see this error an unexpected error occurred while trying to query the Redmine server.  Oftentime this can be due to an invalid SSL certificate.  If this is the case, please ensure you set the request.rejectUnauthorzed property in the integration’s config.js file on the server to false.  If you need fruther assistance with configuring or troubleshooting the integration please contact support@polarity.io
 
