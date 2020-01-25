@@ -62,17 +62,31 @@ function handleRequestError(request) {
       } else if (resp.statusCode === 401) {
         callback({
           detail: `You do not have permission to perform that action`,
+          remediation:
+            'Please confirm you have provided a valid API key and that your account has permissions to query Redmine.',
           messageType: 'alert-warning',
           body: body,
           expectedStatusCode: expectedStatusCode,
-          statusCode: resp.statusCode
+          statusCode: resp.statusCode,
+          requestOptions
+        });
+      } else if (resp.statusCode === 404) {
+        callback({
+          detail: `Resource could not be found`,
+          remediation: 'Please ensure the project set for your Redmine instance is valid.',
+          body: body,
+          expectedStatusCode: expectedStatusCode,
+          statusCode: resp.statusCode,
+          requestOptions
         });
       } else {
         callback({
           detail: `Unexpected status code (${resp.statusCode}) when attempting HTTP request`,
+          remediation: 'Please ensure your Redmine instance is accessible.',
           body: body,
           expectedStatusCode: expectedStatusCode,
-          statusCode: resp.statusCode
+          statusCode: resp.statusCode,
+          requestOptions
         });
       }
     });
@@ -341,11 +355,18 @@ function _updateIssue(options, issueId, attributeName, attributeValue, cb) {
     }
 
     _getIssue(issueId, options, (err, issue) => {
-      if (err) {
-        cb(err);
-      } else {
-        cb(null, issue);
+      if(err){
+        return cb(err);
       }
+
+      if(issue[attributeName] !== attributeValue){
+        return cb({
+          detail: `Cannot update description.  Please check your permissions."`,
+          messageType: 'alert-warning'
+        });
+      }
+
+      cb(null, issue);
     });
   });
 }
