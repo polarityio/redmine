@@ -73,6 +73,9 @@
       </div>
     {{/if}}
     {{#if (or (eq issue.__activeTab "info")(not issue.__activeTab))}}
+        <div>
+          <span class="p-title">{{fa-icon "info-circle" fixedWidth=true}} Info</span>
+        </div>
         <div class="mt-2">
             <span class="p-key">Project:</span>
             <span class="p-value">{{issue.project.name}}</span>
@@ -101,7 +104,11 @@
           {{else}}
             <span class="p-key">Assignee: </span>
           {{/if}}
+          {{#if issue.assigned_to.name}}
           <span class="p-value" style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.assigned_to.name}}</span>
+          {{else}}
+            <span class="font-italic">Unassigned</span>
+          {{/if}}
         </div>
         <div>
             <span class="p-key">Start Date:</span>
@@ -114,7 +121,7 @@
             </div>
         {{/each}}
         <div class="description-container">
-            <span class="p-title">Description
+            <span class="p-title">{{fa-icon "align-justify" fixedWidth=true}} Description
                 <button class="ml-2" {{action "editDescription" index}} type="submit" disabled={{issue.__busy}}>
                     {{#if issue.__editDescription}}cancel{{else}}edit{{/if}}
                 </button>
@@ -133,15 +140,22 @@
 
         </div>
         {{#if (gt issue.attachments.length 0)}}
-            <div class="p-title">Files</div>
+            <div class="p-title">{{fa-icon "paperclip" fixedWidth=true}} Files</div>
         {{/if}}
         {{#each issue.attachments as | attachment |}}
             <div class="attachment-line">
-                {{fa-icon "paperclip" fixedWidth=true class="attachment-icon"}}<a href="{{block.userOptions.url}}/attachments/{{attachment.id}}">{{attachment.filename}}</a>
-                <a href="{{block.userOptions.url}}/attachments/download/{{attachment.id}}/{{attachment.filename}}">{{fa-icon "download" class="download-icon" fixedWidth=true}}</a>
-                <div class="ml-3">
-                    <span class="author-name">{{attachment.author.name}}</span>
-                    <span class="created-on">{{moment-format attachment.created_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
+                <div>
+                  <span class="p-key">File: </span>
+                  <span class="p-value"><a href="{{block.userOptions.url}}/attachments/{{attachment.id}}">{{attachment.filename}}</a>
+                    <span class="ml-1 download-link"><a href="{{block.userOptions.url}}/attachments/download/{{attachment.id}}/{{attachment.filename}}">[download {{fa-icon "download" class="download-icon" fixedWidth=true}}]</a></span>
+                    </span>
+                </div>
+                <div>
+                  <span class="p-key">Author:</span>
+                  <span class="p-value">{{attachment.author.name}}, {{moment-format attachment.created_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
+                </div>
+                <div>
+                  <span class="description">{{attachment.description}}</span>
                 </div>
             </div>
         {{/each}}

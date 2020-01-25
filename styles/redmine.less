@@ -5,7 +5,7 @@
   white-space: pre-wrap;
 }
 
-.description-textarea{
+.description-textarea {
   display: block;
   width: 100%;
   padding: 0.375rem 0.75rem;
@@ -23,7 +23,10 @@
 }
 
 .attachment-line {
-  margin-bottom: 7px;
+  background-color: rgb(240, 240, 240);
+  margin-bottom: 10px;
+  padding: 5px 3px;
+  border-bottom: 2px solid rgb(204, 204, 204);
 
   .attachment-icon {
     color: #666;
@@ -34,6 +37,10 @@
   .download-icon {
     font-size: 10px;
     margin-left: 2px;
+  }
+
+  .download-link{
+    font-weight: 400;
   }
 
   .author-name {
@@ -47,16 +54,21 @@
     display: inline-block;
     margin-top: 2px;
   }
+
+  .description {
+    margin-top: 5px;
+    display: inline-block;
+  }
 }
 
-.journal-entry:first-child{
+.journal-entry:first-child {
   margin-top: 5px;
 }
 
-.journal-entry:nth-child(even){
+.journal-entry:nth-child(even) {
   background: #eee;
 }
-.journal-entry:last-child{
+.journal-entry:last-child {
   border-bottom: none !important;
 }
 
@@ -69,7 +81,7 @@
     margin-bottom: 5px;
   }
 
-  .note{
+  .note {
     margin-top: 5px;
     white-space: pre-wrap;
   }
@@ -79,7 +91,8 @@
   text-align: right;
 }
 
-.description-container, .post-note-container{
+.description-container,
+.post-note-container {
   button {
     border-radius: 4px;
     background-color: #fff;
@@ -99,18 +112,17 @@
   }
 }
 
-.busy-bar{
-  float:right;
+.busy-bar {
+  float: right;
   position: absolute;
   right: 0px;
   margin-right: 10px;
   margin-top: 8px;
 
-  .busy-icon{
-
+  .busy-icon {
   }
 
-  .busy-text{
+  .busy-text {
     color: #888;
     display: inline-block;
     margin-left: 5px;
