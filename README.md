@@ -58,7 +58,8 @@ If you get this error message it means the Redmine User REST API Key you provide
 
 ### Resource could not be found
 
-If you see this message it often means that the project you provided under the Project to Search option does not exist or is not accessible.
+If you see this message it often means that the project you provided under the Project to Search option does not exist or is not accessible.  Ensure you provide
+the project name in all lowercase and replace any spaces in the name with dashes.  For example, if your project is named "My Project", you would enter "my-project".
 
 ### You do not have permission to perform that action
 
