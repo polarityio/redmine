@@ -131,11 +131,11 @@
         <div class="description-container">
             <span class="p-title">{{fa-icon "align-justify" fixedWidth=true}} Description
                 <button class="ml-2" {{action "editDescription" index}} type="submit" disabled={{issue.__busy}}>
-                    {{#if issue.__editDescription}}cancel{{else}}edit{{/if}}
+                    {{#if issue.__editDescription}}cancel{{else}}Edit{{/if}}
                 </button>
                 {{#if issue.__editDescription}}
                     <button class="ml-1" {{action "saveDescription" index issue.id issue.description}} type="submit" disabled={{issue.__busy}}>
-                        save
+                        Save
                     </button>
                 {{/if}}
             </span>
