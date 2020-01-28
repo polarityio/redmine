@@ -7,6 +7,7 @@ polarity.export = PolarityComponent.extend({
   statuses: Ember.computed.alias('block.data.details.statuses'),
   users: Ember.computed.alias('block.data.details.users'),
   issues: Ember.computed.alias('block.data.details.issues'),
+  enableEditing: Ember.computed.alias('block.data.details.enableEditing'),
   isUpdating: false,
   tmpUpdateValue: '',
   actions: {

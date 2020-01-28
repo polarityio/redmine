@@ -251,6 +251,7 @@ async function onDetails(lookupObject, options, cb) {
       });
     },
     (err) => {
+      lookupObject.data.details.enableEditing = options.adminApiKey.length > 0 && options.apiKey.length > 0;
       lookupObject.data.details.statuses = statuses;
       lookupObject.data.details.users = users;
       cb(err, lookupObject.data);

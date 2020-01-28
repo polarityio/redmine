@@ -82,7 +82,7 @@
         </div>
         <div>
           {{!-- Don't allow editing of statuses if no statuses are loaded.  This happens if no admin API key is provided --}}
-          {{#if (gt statuses.length 0)}}
+          {{#if (and (gt statuses.length 0) enableEditing)}}
             <span class="p-key" {{action "showUpdateModal" true "status" issue.status index}}>Status {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
           {{else}}
             <span class="p-key">Status: </span>
@@ -99,7 +99,7 @@
         </div>
         <div>
           {{!-- Don't allow editing of statuses if no statuses are loaded.  This happens if no admin API key is provided --}}
-          {{#if (gt users.length 0)}}
+          {{#if (and (gt users.length 0) enableEditing)}}
             <span class="p-key" {{action "showUpdateModal" true "assignee" issue.assigned_to index}}>Assignee {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
           {{else}}
             <span class="p-key">Assignee: </span>
@@ -130,6 +130,7 @@
         {{/each}}
         <div class="description-container">
             <span class="p-title">{{fa-icon "align-justify" fixedWidth=true}} Description
+              {{#if enableEditing}}
                 <button class="ml-2" {{action "editDescription" index}} type="submit" disabled={{issue.__busy}}>
                     {{#if issue.__editDescription}}cancel{{else}}Edit{{/if}}
                 </button>
@@ -138,6 +139,7 @@
                         Save
                     </button>
                 {{/if}}
+              {{/if}}
             </span>
 
             {{#if issue.__editDescription}}
@@ -169,23 +171,25 @@
         {{/each}}
     {{/if}}
     {{#if (eq issue.__activeTab "history")}}
-        <div class="post-note-container">
-            <div>
-                {{textarea value=issue.__note rows="3"}}
-            </div>
-            <div class="post-note-button-container d-flex align-items-center justify-content-between">
-                <div class="p-red">
-                    {{#if issue.__postNoteError}}
-                        {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__postNoteError}}
-                    {{/if}}
-                </div>
-                <div>
-                    <button {{action "addNote" index issue.id issue.__note}} type="submit" disabled={{issue.__busy}}>
-                        Post
-                    </button>
-                </div>
-            </div>
-        </div>
+        {{#if enableEditing}}
+          <div class="post-note-container">
+              <div>
+                  {{textarea value=issue.__note rows="3"}}
+              </div>
+              <div class="post-note-button-container d-flex align-items-center justify-content-between">
+                  <div class="p-red">
+                      {{#if issue.__postNoteError}}
+                          {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__postNoteError}}
+                      {{/if}}
+                  </div>
+                  <div>
+                      <button {{action "addNote" index issue.id issue.__note}} type="submit" disabled={{issue.__busy}}>
+                          Post
+                      </button>
+                  </div>
+              </div>
+          </div>
+        {{/if}}
         <div>
         {{#each issue.journals as | journal |}}
             {{#if journal.notes}}
