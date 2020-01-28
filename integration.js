@@ -59,7 +59,7 @@ function handleRequestError(request) {
         });
       } else if (resp.statusCode === expectedStatusCode) {
         callback(null, body);
-      }else if(body && Array.isArray(body.errors)){
+      } else if (body && Array.isArray(body.errors)) {
         callback({
           detail: body.errors.join('. '),
           messageType: 'alert-warning',
@@ -67,13 +67,22 @@ function handleRequestError(request) {
           expectedStatusCode: expectedStatusCode,
           statusCode: resp.statusCode,
           requestOptions
-        })
+        });
       } else if (resp.statusCode === 401) {
         callback({
           detail: `You do not have permission to perform that action`,
           remediation:
             'Please confirm you have provided a valid API key and that your account has permissions to query Redmine.',
           messageType: 'alert-warning',
+          body: body,
+          expectedStatusCode: expectedStatusCode,
+          statusCode: resp.statusCode,
+          requestOptions
+        });
+      } else if (resp.statusCode === 403) {
+        callback({
+          detail: `You do not have access to the requested resource.`,
+          remediation: 'Please check your Redmine REST Admin API Key to ensure it has administrator access.',
           body: body,
           expectedStatusCode: expectedStatusCode,
           statusCode: resp.statusCode,
