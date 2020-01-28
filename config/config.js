@@ -1,7 +1,7 @@
 module.exports = {
   name: 'Redmine',
   acronym: 'RED',
-  pdescription: 'Searches issues for supported indicators in the Redmine Project management software',
+  description: 'Searches issues for supported indicators in the Redmine Project management software',
   entityTypes: ['ipv4', 'hash', 'domain', 'email'],
   logging: { level: 'info' },
   block: {
