@@ -59,6 +59,15 @@ function handleRequestError(request) {
         });
       } else if (resp.statusCode === expectedStatusCode) {
         callback(null, body);
+      }else if(body && Array.isArray(body.errors)){
+        callback({
+          detail: body.errors.join('. '),
+          messageType: 'alert-warning',
+          body: body,
+          expectedStatusCode: expectedStatusCode,
+          statusCode: resp.statusCode,
+          requestOptions
+        })
       } else if (resp.statusCode === 401) {
         callback({
           detail: `You do not have permission to perform that action`,
@@ -485,7 +494,7 @@ function onMessage(payload, options, cb) {
         if (err) {
           Logger.error(
             err,
-            `Error updating status from ${payload.newAssignee.name} to ${payload.oldAssignee.name} (issue #${
+            `Error updating assignee from ${payload.newAssignee.name} to ${payload.oldAssignee.name} (issue #${
               payload.id
             }`
           );
