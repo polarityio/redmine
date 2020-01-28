@@ -221,7 +221,10 @@ async function doLookup(entities, options, cb) {
 function _getIssue(options, issueId, cb) {
   const requestOptions = _getIssuesRequestOptions(issueId, options);
   requestWithDefaults(requestOptions, 200, (err, body) => {
-    if (err) cb(err);
+    if (err) {
+      return cb(err);
+    }
+
     if (body.issue && Array.isArray(body.issue.journals)) {
       body.issue.numNotes = body.issue.journals.filter((item) => item.notes.length > 0).length;
     }
