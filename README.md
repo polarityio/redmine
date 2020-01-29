@@ -78,6 +78,7 @@ If you see this error an unexpected error occurred while trying to query the Red
 
 - Redmine does not currently support editing or deleting an existing note via the REST API
 - Redmine does not support search filtering on priority or status of an issue via the REST API
+- When using special characters in an issue description, the integration will display a warning that the save operation failed
 
 ## Polarity
 
