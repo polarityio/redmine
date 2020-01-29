@@ -1,7 +1,7 @@
 module.exports = {
   name: 'Redmine',
   acronym: 'RED',
-  pdescription: 'Searches issues for supported indicators in the Redmine Project management software',
+  description: 'Searches issues for supported indicators in the Redmine Project management software',
   entityTypes: ['ipv4', 'hash', 'domain', 'email'],
   logging: { level: 'info' },
   block: {
@@ -48,8 +48,20 @@ module.exports = {
       adminOnly: true
     },
     {
+      key: 'adminApiKey',
+      name: 'Redmine Administrator REST API Key',
+      description:
+        'A REST API Key for your Redmine administrator.  This key is used to retrieve user and status information when the integration first starts. The user information is used' +
+        ' to populate the Assignee field of the issue.  If not provided, the status and assignee fields will not be editable.  The Admin API Key is not used for performing searches,' +
+        ' editing issues, or adding notes.  >> Please restart the integration after modifying this option.',
+      default: '',
+      type: 'password',
+      userCanEdit: false,
+      adminOnly: true
+    },
+    {
       key: 'apiKey',
-      name: 'Redmine REST APIKey',
+      name: 'Redmine User REST API Key',
       description:
         'The REST API Key used to authenticate to your Redmine instance. If left blank, no authentication will be used when communicating with the specified Redmine instance',
       default: '',
@@ -60,7 +72,7 @@ module.exports = {
     {
       key: 'project',
       name: 'Project to Search',
-      description: 'The name of a single project to search.  If left blank, all projects will be searched.',
+      description: 'The name of a single project to search.  If left blank, all projects will be searched.  Project name should be all lowercase with dashes in place of spaces.',
       default: '',
       type: 'text',
       userCanEdit: true,

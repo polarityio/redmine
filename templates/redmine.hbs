@@ -2,16 +2,22 @@
     {{#if (gt index 0)}}
         <hr>
     {{/if}}
+
     <div class="p-title">
         <a href="{{block.userOptions.url}}/issues/{{issue.id}}">
             {{issue.tracker.name}} #{{issue.id}}: {{issue.subject}} {{fa-icon "external-link-square" class="external-icon" fixedWidth=true}}
         </a>
     </div>
+
     {{#if issue.__error}}
-        <div class="alert alert-danger" role="alert">
-            {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__error}}
+        <div class="alert {{issue.__error.type}} alert-dismissible" role="alert">
+          {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__error.message}}
+          <button {{action "closeError" index}} type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
     {{/if}}
+
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <a {{action "changeTab" "info" index}} class="nav-link {{if (or (eq issue.__activeTab "info")(not issue.__activeTab)) "active"}}" href="#">{{issue.tracker.name}}</a>
@@ -25,26 +31,96 @@
             </div>
         {{/if}}
     </ul>
+    {{#if (eq issue.__showUpdateModal true)}}
+      <div style="position:relative; width:100%">
+        <div class="update-modal">
+          <form>
+            <div class="form-group">
+              <label>{{capitalize updateFieldName}}</label>
+              {{#if (eq updateFieldName "assignee")}}
+                {{#power-select
+                        options=users
+                        selected=tmpUpdateValue
+                        searchEnabled=true
+                        searchField="name"
+                        placeholder="Users"
+                        onchange=(action (mut tmpUpdateValue)) as |user|}}
+                  {{user.name}}
+                {{/power-select}}
+              {{else}}
+                {{#power-select
+                        options=statuses
+                        selected=tmpUpdateValue
+                        searchEnabled=true
+                        searchField="name"
+                        placeholder="Statuses"
+                        onchange=(action (mut tmpUpdateValue)) as |status|}}
+                  {{status.name}}
+                {{/power-select}}
+              {{/if}}
+            </div>
+            <button type="submit" disabled={{isUpdating}} {{action "updateAttribute" issue updateFieldName tmpUpdateValue index}} class="float-right btn btn-sm btn-secondary">
+            {{#if isUpdating}}
+              {{fa-icon "spinner-third" spin=true fixedWidth=true}}
+            {{else}}
+              {{fa-icon "save" fixedWidth=true}}
+            {{/if}}
+            Save
+            </button>
+            <button type="submit" disabled={{isUpdating}} {{action "showUpdateModal" false updateFieldName tmpUpdateValue index}} class="float-right mr-1 btn btn-sm btn-outline-secondary">Cancel</button>
+          </form>
+        </div>
+      </div>
+    {{/if}}
     {{#if (or (eq issue.__activeTab "info")(not issue.__activeTab))}}
+        <div>
+          <span class="p-title">{{fa-icon "info-circle" fixedWidth=true}} Info</span>
+        </div>
         <div class="mt-2">
             <span class="p-key">Project:</span>
             <span class="p-value">{{issue.project.name}}</span>
         </div>
         <div>
-            <span class="p-key">Status:</span>
-            <span class="p-value">{{issue.status.name}}</span>
+          {{!-- Don't allow editing of statuses if no statuses are loaded.  This happens if no admin API key is provided --}}
+          {{#if (and (gt statuses.length 0) enableEditing)}}
+            <span class="p-key" {{action "showUpdateModal" true "status" issue.status index}}>Status {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
+          {{else}}
+            <span class="p-key">Status: </span>
+          {{/if}}
+          <span class="p-value" style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.status.name}}</span>
         </div>
         <div>
             <span class="p-key">Priority:</span>
             <span class="p-value">{{issue.priority.name}}</span>
         </div>
         <div>
-            <span class="p-key">Assignee:</span>
-            <span class="p-value">{{issue.assigned_to.name}}</span>
+          <span class="p-key">Author:</span>
+          <span class="p-value">{{issue.author.name}}</span>
+        </div>
+        <div>
+          {{!-- Don't allow editing of statuses if no statuses are loaded.  This happens if no admin API key is provided --}}
+          {{#if (and (gt users.length 0) enableEditing)}}
+            <span class="p-key" {{action "showUpdateModal" true "assignee" issue.assigned_to index}}>Assignee {{fa-icon "edit" fixedWidth=true class="edit-icon"}}: </span>
+          {{else}}
+            <span class="p-key">Assignee: </span>
+          {{/if}}
+          {{#if issue.assigned_to.name}}
+          <span class="p-value" style="color:{{item.confidenceColor}}; font-weight: bold">{{issue.assigned_to.name}}</span>
+          {{else}}
+            <span class="font-italic">Unassigned</span>
+          {{/if}}
         </div>
         <div>
             <span class="p-key">Start Date:</span>
             <span class="p-value">{{issue.start_date}}</span>
+        </div>
+        <div>
+          <span class="p-key">Created:</span>
+          <span class="p-value">{{moment-format issue.created_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
+        </div>
+        <div>
+          <span class="p-key">Updated:</span>
+          <span class="p-value">{{moment-format issue.updated_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
         </div>
         {{#each issue.custom_fields as | field | }}
             <div>
@@ -53,15 +129,17 @@
             </div>
         {{/each}}
         <div class="description-container">
-            <span class="p-title">Description
+            <span class="p-title">{{fa-icon "align-justify" fixedWidth=true}} Description
+              {{#if enableEditing}}
                 <button class="ml-2" {{action "editDescription" index}} type="submit" disabled={{issue.__busy}}>
-                    {{#if issue.__editDescription}}cancel{{else}}edit{{/if}}
+                    {{#if issue.__editDescription}}cancel{{else}}Edit{{/if}}
                 </button>
                 {{#if issue.__editDescription}}
                     <button class="ml-1" {{action "saveDescription" index issue.id issue.description}} type="submit" disabled={{issue.__busy}}>
-                        save
+                        Save
                     </button>
                 {{/if}}
+              {{/if}}
             </span>
 
             {{#if issue.__editDescription}}
@@ -72,37 +150,46 @@
 
         </div>
         {{#if (gt issue.attachments.length 0)}}
-            <div class="p-title">Files</div>
+            <div class="p-title">{{fa-icon "paperclip" fixedWidth=true}} Files</div>
         {{/if}}
         {{#each issue.attachments as | attachment |}}
             <div class="attachment-line">
-                {{fa-icon "paperclip" fixedWidth=true class="attachment-icon"}}<a href="{{block.userOptions.url}}/attachments/{{attachment.id}}">{{attachment.filename}}</a>
-                <a href="{{block.userOptions.url}}/attachments/download/{{attachment.id}}/{{attachment.filename}}">{{fa-icon "download" class="download-icon" fixedWidth=true}}</a>
-                <div class="ml-3">
-                    <span class="author-name">{{attachment.author.name}}</span>
-                    <span class="created-on">{{moment-format attachment.created_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
+                <div>
+                  <span class="p-key">File: </span>
+                  <span class="p-value"><a href="{{block.userOptions.url}}/attachments/{{attachment.id}}">{{attachment.filename}} {{fa-icon "external-link-square" class="external-icon" fixedWidth=true}}</a>
+                    <span class="ml-1 download-link"><a href="{{block.userOptions.url}}/attachments/download/{{attachment.id}}/{{attachment.filename}}">[download {{fa-icon "download" class="download-icon" fixedWidth=true}}]</a></span>
+                    </span>
+                </div>
+                <div>
+                  <span class="p-key">Author:</span>
+                  <span class="p-value">{{attachment.author.name}}, {{moment-format attachment.created_on "YYYY-MM-DD HH:mm:ss z" timeZone=timezone}}</span>
+                </div>
+                <div>
+                  <span class="description">{{attachment.description}}</span>
                 </div>
             </div>
         {{/each}}
     {{/if}}
     {{#if (eq issue.__activeTab "history")}}
-        <div class="post-note-container">
-            <div>
-                {{textarea value=issue.__note rows="3"}}
-            </div>
-            <div class="post-note-button-container d-flex align-items-center justify-content-between">
-                <div class="p-red">
-                    {{#if issue.__postNoteError}}
-                        {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__postNoteError}}
-                    {{/if}}
-                </div>
-                <div>
-                    <button {{action "addNote" index issue.id issue.__note}} type="submit" disabled={{issue.__busy}}>
-                        Post
-                    </button>
-                </div>
-            </div>
-        </div>
+        {{#if enableEditing}}
+          <div class="post-note-container">
+              <div>
+                  {{textarea value=issue.__note rows="3"}}
+              </div>
+              <div class="post-note-button-container d-flex align-items-center justify-content-between">
+                  <div class="p-red">
+                      {{#if issue.__postNoteError}}
+                          {{fa-icon "exclamation-triangle" fixedWidth=true}} {{issue.__postNoteError}}
+                      {{/if}}
+                  </div>
+                  <div>
+                      <button {{action "addNote" index issue.id issue.__note}} type="submit" disabled={{issue.__busy}}>
+                          Post
+                      </button>
+                  </div>
+              </div>
+          </div>
+        {{/if}}
         <div>
         {{#each issue.journals as | journal |}}
             {{#if journal.notes}}
@@ -117,3 +204,4 @@
         </div>
     {{/if}}
 {{/each}}
+
