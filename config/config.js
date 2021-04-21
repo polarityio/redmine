@@ -12,6 +12,7 @@ module.exports = {
       file: './templates/redmine.hbs'
     }
   },
+  defaultColor: 'light-purple',
   styles: ['./styles/redmine.less'],
   request: {
     // Provide the path to your certFile. Leave an empty string to ignore this option.
