@@ -235,7 +235,12 @@ function _getIssue(options, issueId, cb) {
     }
 
     if (body.issue && Array.isArray(body.issue.journals)) {
-      body.issue.numNotes = body.issue.journals.filter((item) => item.notes.length > 0).length;
+      body.issue.numNotes = body.issue.journals.filter((item) => {
+        if(Array.isArray(item.notes)){
+          return item.notes.length > 0
+        }
+        return false
+      }).length;
     }
     Logger.debug({ issue: body.issue }, 'Returning Issue');
     cb(null, body.issue);
