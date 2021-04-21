@@ -44,7 +44,7 @@
                         searchEnabled=true
                         searchField="name"
                         placeholder="Users"
-                        onchange=(action (mut tmpUpdateValue)) as |user|}}
+                        onChange=(action (mut tmpUpdateValue)) as |user|}}
                   {{user.name}}
                 {{/power-select}}
               {{else}}
@@ -54,7 +54,7 @@
                         searchEnabled=true
                         searchField="name"
                         placeholder="Statuses"
-                        onchange=(action (mut tmpUpdateValue)) as |status|}}
+                        onChange=(action (mut tmpUpdateValue)) as |status|}}
                   {{status.name}}
                 {{/power-select}}
               {{/if}}
@@ -132,7 +132,7 @@
             <span class="p-title">{{fa-icon "align-justify" fixedWidth=true}} Description
               {{#if enableEditing}}
                 <button class="ml-2" {{action "editDescription" index}} type="submit" disabled={{issue.__busy}}>
-                    {{#if issue.__editDescription}}cancel{{else}}Edit{{/if}}
+                    {{#if issue.__editDescription}}Cancel{{else}}Edit{{/if}}
                 </button>
                 {{#if issue.__editDescription}}
                     <button class="ml-1" {{action "saveDescription" index issue.id issue.description}} type="submit" disabled={{issue.__busy}}>
