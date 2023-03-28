@@ -1,4 +1,5 @@
 {
+  "polarityIntegrationUuid": "d1d68c00-cce1-11ed-aeee-075d3490155d",
   "name": "Redmine",
   "acronym": "RED",
   "description": "Searches issues for supported indicators in the Redmine Project management software",
