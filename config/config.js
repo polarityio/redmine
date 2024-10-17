@@ -2,7 +2,7 @@ module.exports = {
   name: 'Redmine',
   acronym: 'RED',
   description: 'Searches issues for supported indicators in the Redmine Project management software',
-  entityTypes: ['ipv4', 'hash', 'domain', 'email'],
+  entityTypes: ['IPv4', 'MD5', 'SHA1', 'SHA256', 'domain', 'email'],
   logging: { level: 'info' },
   block: {
     component: {
@@ -29,7 +29,7 @@ module.exports = {
     ca: '',
     // An HTTP proxy to be used. Supports proxy Auth with Basic Auth, identical to support for
     // the url parameter (by embedding the auth info in the uri)
-    proxy: ""
+    proxy: ''
   },
   options: [
     {
@@ -67,7 +67,8 @@ module.exports = {
     {
       key: 'project',
       name: 'Project to Search',
-      description: 'The name of a single project to search.  If left blank, all projects will be searched.  Project name should be all lowercase with dashes in place of spaces.',
+      description:
+        'The name of a single project to search.  If left blank, all projects will be searched.  Project name should be all lowercase with dashes in place of spaces.',
       default: '',
       type: 'text',
       userCanEdit: true,

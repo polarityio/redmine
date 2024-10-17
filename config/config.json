@@ -3,12 +3,7 @@
   "name": "Redmine",
   "acronym": "RED",
   "description": "Searches issues for supported indicators in the Redmine Project management software",
-  "entityTypes": [
-    "IPv4",
-    "hash",
-    "domain",
-    "email"
-  ],
+  "entityTypes": ["IPv4", "MD5", "SHA1", "SHA256", "domain", "email"],
   "logging": {
     "level": "info"
   },
@@ -21,16 +16,7 @@
     }
   },
   "defaultColor": "light-purple",
-  "styles": [
-    "./styles/redmine.less"
-  ],
-  "request": {
-    "cert": "",
-    "key": "",
-    "passphrase": "",
-    "ca": "",
-    "proxy": ""
-  },
+  "styles": ["./styles/redmine.less"],
   "options": [
     {
       "key": "url",
