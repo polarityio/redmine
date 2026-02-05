@@ -1,0 +1,172 @@
+{
+  "issues": [
+    {
+      "id": 12345,
+      "project": {
+        "id": 1,
+        "name": "Security Operations"
+      },
+      "tracker": {
+        "id": 2,
+        "name": "Bug"
+      },
+      "status": {
+        "id": 2,
+        "name": "In Progress"
+      },
+      "priority": {
+        "id": 3,
+        "name": "High"
+      },
+      "author": {
+        "id": 5,
+        "name": "John Smith"
+      },
+      "assigned_to": {
+        "id": 8,
+        "name": "Jane Doe"
+      },
+      "subject": "Investigate suspicious network traffic from 192.168.1.100",
+      "description": "Multiple alerts triggered for unusual outbound connections to known malicious IPs. Initial triage indicates potential data exfiltration attempt.",
+      "start_date": "2024-01-15",
+      "done_ratio": 40,
+      "custom_fields": [
+        {
+          "id": 1,
+          "name": "Severity",
+          "value": "Critical"
+        },
+        {
+          "id": 2,
+          "name": "IOC",
+          "value": "192.168.1.100"
+        }
+      ],
+      "created_on": "2024-01-15T09:23:15Z",
+      "updated_on": "2024-01-16T14:32:01Z",
+      "closed_on": null,
+      "attachments": [
+        {
+          "id": 789,
+          "filename": "network-capture.pcap",
+          "filesize": 2048576,
+          "content_type": "application/vnd.tcpdump.pcap",
+          "description": "Packet capture from suspicious timeframe",
+          "author": {
+            "id": 5,
+            "name": "John Smith"
+          },
+          "created_on": "2024-01-15T10:15:00Z"
+        }
+      ],
+      "journals": [
+        {
+          "id": 101,
+          "user": {
+            "id": 8,
+            "name": "Jane Doe"
+          },
+          "notes": "Confirmed malicious activity. Isolating affected host.",
+          "created_on": "2024-01-15T11:45:30Z",
+          "details": []
+        },
+        {
+          "id": 102,
+          "user": {
+            "id": 8,
+            "name": "Jane Doe"
+          },
+          "notes": "Host isolated. Running full forensic analysis.",
+          "created_on": "2024-01-15T13:20:15Z",
+          "details": []
+        }
+      ],
+      "numNotes": 2,
+      "relations": [],
+      "children": []
+    },
+    {
+      "id": 12346,
+      "project": {
+        "id": 1,
+        "name": "Security Operations"
+      },
+      "tracker": {
+        "id": 1,
+        "name": "Task"
+      },
+      "status": {
+        "id": 1,
+        "name": "New"
+      },
+      "priority": {
+        "id": 2,
+        "name": "Normal"
+      },
+      "author": {
+        "id": 5,
+        "name": "John Smith"
+      },
+      "assigned_to": {
+        "id": 10,
+        "name": "Bob Johnson"
+      },
+      "subject": "Review phishing email reported by user@example.com",
+      "description": "User reported suspicious email with attachment. Need to analyze for malware indicators and update email filtering rules.",
+      "start_date": "2024-01-16",
+      "done_ratio": 0,
+      "custom_fields": [
+        {
+          "id": 1,
+          "name": "Severity",
+          "value": "Medium"
+        }
+      ],
+      "created_on": "2024-01-16T08:12:45Z",
+      "updated_on": "2024-01-16T08:12:45Z",
+      "closed_on": null,
+      "attachments": [],
+      "journals": [],
+      "numNotes": 0,
+      "relations": [],
+      "children": []
+    }
+  ],
+  "statuses": [
+    {
+      "id": 1,
+      "name": "New",
+      "is_closed": false
+    },
+    {
+      "id": 2,
+      "name": "In Progress",
+      "is_closed": false
+    },
+    {
+      "id": 3,
+      "name": "Resolved",
+      "is_closed": false
+    },
+    {
+      "id": 4,
+      "name": "Closed",
+      "is_closed": true
+    }
+  ],
+  "users": [
+    {
+      "id": 5,
+      "name": "John Smith"
+    },
+    {
+      "id": 8,
+      "name": "Jane Doe"
+    },
+    {
+      "id": 10,
+      "name": "Bob Johnson"
+    }
+  ],
+  "enableEditing": true
+}
